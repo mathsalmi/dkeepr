@@ -2,60 +2,48 @@ package dkeepr
 
 import (
 	"database/sql"
-
-	"bitbucket.org/mathsalmi/dkeepr/drivers"
 )
 
 // Dkeepr is an ORM object
 type Dkeepr struct {
-	conn   *sql.DB
-	driver string
-	url    string
+	driver ormDriver
 }
 
 // NewDkeepr returns a new Dkeepr
 func NewDkeepr(driver, url string) (*Dkeepr, error) {
-	orm := &Dkeepr{}
-
-	err := orm.SetDriver(driver)
+	// open db connection
+	db, err := sql.Open(driver, url)
 	if err != nil {
 		return nil, err
 	}
 
-	orm.url = url
+	// get driver instance
+	ormdriver, err := newDriver(driver, db)
+	if err != nil {
+		return nil, err
+	}
 
+	orm := &Dkeepr{driver: ormdriver}
 	return orm, nil
 }
 
-// Driver tells the DB driver currently in use
-func (d *Dkeepr) Driver() string {
-	return d.driver
-}
-
-// SetDriver tells the ORM which DB driver to use
-func (d *Dkeepr) SetDriver(driver string) error {
-	if !drivers.IsDriverSupported(driver) {
-		return ErrDriverNotSupported
+// DriverName tells the DB driver currently in use
+func (d *Dkeepr) DriverName() string {
+	name := ""
+	if d.driver != nil {
+		name = d.driver.Name()
 	}
-
-	d.driver = driver
-
-	return nil
-}
-
-// Open opens the connection with the DB
-func (d *Dkeepr) Open() error {
-	db, err := sql.Open(d.driver, d.url)
-	if err != nil {
-		return err
-	}
-
-	d.conn = db
-
-	return nil
+	return name
 }
 
 // Close closes the open connection
 func (d *Dkeepr) Close() error {
-	return d.conn.Close()
+	switch {
+	case d.driver == nil:
+		return ErrDriverNotChosen
+	case d.driver.DB() == nil:
+		return ErrConnNotOpen
+	}
+
+	return d.driver.DB().Close()
 }

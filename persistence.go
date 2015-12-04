@@ -1,8 +1,6 @@
 package dkeepr
 
-import (
-	"reflect"
-)
+import "fmt"
 
 // Orm represents an ORM with common CRUD operations
 //
@@ -17,15 +15,18 @@ type Orm interface {
 
 // Save saves an entity
 func (d *Dkeepr) Save(o interface{}) error {
-	// check if struct
-	t := reflect.TypeOf(o)
-	if t.Elem() != reflect.Struct {
-		return ErrNotStruct
+
+	pe, err := parseEntity(o)
+	if err != nil {
+		return err
 	}
 
-	tableName := t.Name()
+	id, err := d.driver.Save(pe.tablename, pe.columns, pe.values)
+	if err != nil {
+		return err
+	}
 
-	v := reflect.ValueOf(o)
+	fmt.Println("ID: ", id)
 
 	return nil
 }
