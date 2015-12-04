@@ -14,6 +14,6 @@ func IsDriverSupported(driver string) bool {
 }
 
 // TODO: define an unexported interface for drivers, to be called "ormDrivers"
-type ormDrivers interface {
+type ormDriver interface {
 	save(table string, columns []string, values []interface{}) (interface{}, error)
 }

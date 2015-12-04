@@ -1,4 +1,4 @@
-package main
+package dkeepr
 
 import (
 	"reflect"
@@ -22,6 +22,7 @@ func (d *Dkeepr) Save(o interface{}) error {
 	if t.Elem() != reflect.Struct {
 		return ErrNotStruct
 	}
+
 	tableName := t.Name()
 
 	v := reflect.ValueOf(o)
