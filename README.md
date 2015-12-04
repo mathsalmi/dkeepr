@@ -18,3 +18,4 @@ TODOs
 - Make it work with multiple DBs
 - Create tests
 - Create a pool of connections
+- Think of a way to customize struct names
