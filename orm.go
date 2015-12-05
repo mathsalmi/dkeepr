@@ -1,8 +1,6 @@
 package dkeepr
 
-import (
-	"database/sql"
-)
+import "database/sql"
 
 // Dkeepr is an ORM object
 type Dkeepr struct {

@@ -14,5 +14,5 @@ var (
 
 	// reflection
 	ErrNotStruct   = errors.New("ORM: only structs can be persisted")
-	ErrUnknownType = errors.New("ORM: unknown type")
+	ErrUnknownType = errors.New("ORM: unknown type") // TODO: show type name
 )

@@ -1,39 +1,40 @@
 package dkeepr
 
-import "fmt"
-
 // Orm represents an ORM with common CRUD operations
 //
 // TODO: will it be useful? perhaps its not necessary as there is
 // no standard like Java JPA
 type Orm interface {
-	Save(o interface{}) error
+	Save(o interface{}) (interface{}, error)
 	Delete(o interface{}) error
 	Find(id interface{}) (interface{}, error)
 	FindAll(field string, value interface{}) (interface{}, error)
 }
 
 // Save saves an entity
-func (d *Dkeepr) Save(o interface{}) error {
+func (d *Dkeepr) Save(o interface{}) (interface{}, error) {
 
+	pe, err := parseEntity(o)
+	if err != nil {
+		return nil, err
+	}
+
+	id, err := d.driver.Save(pe)
+	if err != nil {
+		return nil, err
+	}
+
+	return id, nil
+}
+
+// Delete deletes an entity given its ID
+func (d *Dkeepr) Delete(o interface{}) error {
 	pe, err := parseEntity(o)
 	if err != nil {
 		return err
 	}
 
-	id, err := d.driver.Save(pe.tablename, pe.columns, pe.values)
-	if err != nil {
-		return err
-	}
-
-	fmt.Println("ID: ", id)
-
-	return nil
-}
-
-// Delete deletes an entity given its ID
-func (d *Dkeepr) Delete(o interface{}) error {
-	return nil
+	return d.driver.Delete(pe)
 }
 
 // Find finds an entity given its ID

@@ -3,6 +3,7 @@ package dkeepr
 import (
 	"database/sql"
 
+	"bitbucket.org/mathsalmi/dkeepr/drivers"
 	"bitbucket.org/mathsalmi/dkeepr/drivers/postgres"
 )
 
@@ -11,7 +12,8 @@ type ormDriver interface {
 	DB() *sql.DB
 	Name() string
 
-	Save(table string, columns []string, values []interface{}) (interface{}, error)
+	Save(e drivers.Entity) (interface{}, error)
+	Delete(e drivers.Entity) error
 }
 
 // NewDriver returns an instance of a given DB driver

@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	"strings"
+
+	"bitbucket.org/mathsalmi/dkeepr/drivers"
 )
 
 const (
@@ -32,29 +34,39 @@ func (p *Postgres) Name() string {
 }
 
 // Save saves an entity
-func (p *Postgres) Save(table string, columns []string, values []interface{}) (interface{}, error) {
+func (p *Postgres) Save(e drivers.Entity) (interface{}, error) {
 
-	placeholders := makePlaceholders(len(columns))
+	placeholders := makePlaceholders(len(e.Columns()))
 
-	sql := fmt.Sprintf(`INSERT INTO %s(%s) VALUES (%s) RETURNING "ID"`, quote(table), quoteAndJoin(columns), strings.Join(placeholders, ","))
+	sql := fmt.Sprintf(`INSERT INTO %s(%s) VALUES (%s) RETURNING %s`,
+		quote(e.Tablename()),
+		quoteAndJoin(e.Columns()),
+		strings.Join(placeholders, del),
+		quoteAndJoin(e.Pk()))
 
-	rows, err := p.db.Query(sql, values...)
-	if err != nil {
-		return nil, err
+	row := p.db.QueryRow(sql, e.Values()...)
+	if row == nil {
+		return nil, drivers.ErrNoResult
 	}
 
 	var id interface{}
-	rows.Scan(&id)
+	if err := row.Scan(&id); err != nil {
+		return nil, err
+	}
 
 	return id, nil
 }
 
-// MakePlaceholders returns a slice of placeholders
-func makePlaceholders(total int) []string {
-	var out = make([]string, total)
-	for i := 0; i < total; i++ {
-		out[i] = "$" + fmt.Sprintf("%d", i+1)
+// Delete deletes an entity
+func (p *Postgres) Delete(e drivers.Entity) error {
+	placeholders := makePairPlaceholders(e.Pk())
+
+	sql := fmt.Sprintf("DELETE FROM %s WHERE %s", quote(e.Tablename()), strings.Join(placeholders, " AND "))
+
+	_, err := p.db.Exec(sql, e.Pkvalues()...)
+	if err != nil {
+		return err
 	}
 
-	return out
+	return nil
 }

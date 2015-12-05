@@ -1,6 +1,9 @@
 package postgres
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 // quote escapes a single string
 func quote(str string) string {
@@ -20,4 +23,25 @@ func quoteAndJoin(columns []string) string {
 	}
 
 	return sql
+}
+
+// MakePlaceholders returns a slice of placeholders
+func makePlaceholders(total int) []string {
+	var out = make([]string, total)
+	for i := 0; i < total; i++ {
+		out[i] = "$" + fmt.Sprintf("%d", i+1)
+	}
+
+	return out
+}
+
+// MakePairPlaceholders returns a slice with pair-based placeholder.
+// Eg.: something like KEY=$1...
+func makePairPlaceholders(keys []string) []string {
+	out := make([]string, len(keys))
+	for i, key := range keys {
+		out[i] = fmt.Sprintf("%s=$%d", quote(key), i+1)
+	}
+
+	return out
 }
