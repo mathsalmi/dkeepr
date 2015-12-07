@@ -7,6 +7,7 @@ var (
 	// driver
 	ErrDriverNotSupported = errors.New("ORM: driver not supported")
 	ErrDriverNotChosen    = errors.New("ORM: driver not chosen yet. Use NewDkeepr func to get a proper instance")
+	ErrMethodNotImpl      = errors.New("ORM: method not implemented")
 
 	// connection
 	ErrOpenConnection = errors.New("ORM: error opening connection with DB")

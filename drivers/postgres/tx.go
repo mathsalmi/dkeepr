@@ -19,22 +19,13 @@ func (p *Postgres) Begin() (drivers.Transaction, error) {
 
 // Transaction represents a transaction of the DB
 type Transaction struct {
-	err error
-	db  *sql.DB
-}
-
-// Add func adds a operations to the current transaction
-func (tx *Transaction) Add(fn func() error) drivers.Transaction {
-	if tx.err == nil {
-		tx.err = fn()
-	}
-
-	return tx
+	drivers.Tx
+	db *sql.DB
 }
 
 // CommitOrRollback either commits or rollsback the current transaction
 func (tx *Transaction) CommitOrRollback() error {
-	if tx.err != nil {
+	if tx.Err() != nil {
 		tx.db.Exec("rollback") // TODO: handle err
 		return errs.ErrCommit
 	}
