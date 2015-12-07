@@ -12,6 +12,7 @@ type ormDriver interface {
 	DB() *sql.DB
 	Name() string
 
+	Begin() (drivers.Transaction, error)
 	Save(e drivers.Entity) (interface{}, error)
 	Delete(e drivers.Entity) error
 }

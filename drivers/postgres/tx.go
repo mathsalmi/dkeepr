@@ -7,7 +7,7 @@ import (
 )
 
 // Begin starts a new transaction
-func (p *Postgres) Begin() (*Transaction, error) {
+func (p *Postgres) Begin() (drivers.Transaction, error) {
 	_, err := p.DB().Exec("begin transaction")
 	if err != nil {
 		return nil, drivers.ErrBegin
@@ -23,7 +23,7 @@ type Transaction struct {
 }
 
 // Add func adds a operations to the current transaction
-func (tx *Transaction) Add(fn func() error) *Transaction {
+func (tx *Transaction) Add(fn func() error) drivers.Transaction {
 	if tx.err == nil {
 		tx.err = fn()
 	}
