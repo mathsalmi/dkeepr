@@ -19,4 +19,3 @@ TODOs
 - Create tests
 - Create a pool of connections
 - Think of a way to customize struct names
-- Support for transactions
