@@ -3,6 +3,7 @@ package postgres
 import (
 	"database/sql"
 	"fmt"
+	"reflect"
 	"strings"
 
 	"bitbucket.org/mathsalmi/dkeepr/drivers"
@@ -36,13 +37,28 @@ func (p *Postgres) Name() string {
 // Save saves an entity
 func (p *Postgres) Save(e drivers.Entity) (interface{}, error) {
 
-	placeholders := makePlaceholders(len(e.Columns()))
+	var sql = ""
 
-	sql := fmt.Sprintf(`INSERT INTO %s(%s) VALUES (%s) RETURNING %s`,
-		quote(e.Tablename()),
-		quoteAndJoin(e.Columns()),
-		strings.Join(placeholders, del),
-		quoteAndJoin(e.Pk()))
+	if IsPkEmpty(e) {
+
+		placeholders := makePlaceholders(len(e.Columns()))
+
+		sql = fmt.Sprintf(`INSERT INTO %s(%s) VALUES (%s) RETURNING %s`,
+			quote(e.Tablename()),
+			quoteAndJoin(e.Columns()),
+			strings.Join(placeholders, del),
+			quoteAndJoin(e.Pk()))
+	} else {
+		fields := makePairPlaceholders(e.Columns())
+		ids := makePairPlaceholders(e.Pk())
+		sql = fmt.Sprintf(`UPDATE %s SET %s WHERE %s RETURNING %s`,
+			quote(e.Tablename()),
+			strings.Join(fields, del),
+			strings.Join(ids, " AND "),
+			strings.Join(ids, " AND "))
+	}
+
+	fmt.Println(sql)
 
 	row := p.db.QueryRow(sql, e.Values()...)
 	if row == nil {
@@ -59,6 +75,11 @@ func (p *Postgres) Save(e drivers.Entity) (interface{}, error) {
 
 // Delete deletes an entity
 func (p *Postgres) Delete(e drivers.Entity) error {
+	// check ids
+	if IsPkEmpty(e) {
+		return drivers.ErrNoPk
+	}
+
 	placeholders := makePairPlaceholders(e.Pk())
 
 	sql := fmt.Sprintf("DELETE FROM %s WHERE %s", quote(e.Tablename()), strings.Join(placeholders, " AND "))
@@ -69,4 +90,22 @@ func (p *Postgres) Delete(e drivers.Entity) error {
 	}
 
 	return nil
+}
+
+// IsPkEmpty returns false if at least one element of ID slice
+// is different than the zero value for its type
+//
+// eg.: zero value for int is 0, it checks if id != 0
+//      zero value for string is "", it checks if id != ""
+//      and so on…
+func IsPkEmpty(e drivers.Entity) bool {
+	values := e.Pkvalues()
+	for _, val := range values {
+		zero := reflect.Zero(reflect.TypeOf(val))
+		if val != zero.Interface() {
+			return false
+		}
+	}
+
+	return true
 }

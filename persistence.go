@@ -5,10 +5,18 @@ package dkeepr
 // TODO: will it be useful? perhaps its not necessary as there is
 // no standard like Java JPA
 type Orm interface {
+	Begin() (Transaction, error)
 	Save(o interface{}) (interface{}, error)
 	Delete(o interface{}) error
 	Find(id interface{}) (interface{}, error)
 	FindAll(field string, value interface{}) (interface{}, error)
+}
+
+// Transaction is the representation of a transaction
+type Transaction interface {
+	Begin() (Transaction, error)
+	Add(fn func() error) Transaction
+	CommitOrRollback() error
 }
 
 // Save saves an entity
@@ -45,4 +53,9 @@ func (d *Dkeepr) Find(id interface{}) (interface{}, error) {
 // FindAll finds one or more entities given a field and its value
 func (d *Dkeepr) FindAll(field string, value interface{}) (interface{}, error) {
 	return nil, nil
+}
+
+// Begin starts a new transaction
+func (d *Dkeepr) Begin() (Transaction, error) {
+	return d.Begin()
 }
