@@ -2,18 +2,6 @@ package dkeepr
 
 import "bitbucket.org/mathsalmi/dkeepr/drivers"
 
-// Orm represents an ORM with common CRUD operations
-//
-// TODO: will it be useful? perhaps its not necessary as there is
-// no standard like Java JPA
-type Orm interface {
-	Begin() (drivers.Transaction, error)
-	Save(o interface{}) (interface{}, error)
-	Delete(o interface{}) error
-	Find(id interface{}) (interface{}, error)
-	FindAll(field string, value interface{}) (interface{}, error)
-}
-
 // Save saves an entity
 func (d *Dkeepr) Save(o interface{}) (interface{}, error) {
 
