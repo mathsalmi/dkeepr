@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"bitbucket.org/mathsalmi/dkeepr/drivers"
+	"bitbucket.org/mathsalmi/dkeepr/errors"
 )
 
 const (
@@ -62,7 +63,7 @@ func (p *Postgres) Save(e drivers.Entity) (interface{}, error) {
 
 	row := p.db.QueryRow(sql, e.Values()...)
 	if row == nil {
-		return nil, drivers.ErrNoResult
+		return nil, errs.ErrNoResult
 	}
 
 	var id interface{}
@@ -77,7 +78,7 @@ func (p *Postgres) Save(e drivers.Entity) (interface{}, error) {
 func (p *Postgres) Delete(e drivers.Entity) error {
 	// check ids
 	if IsPkEmpty(e) {
-		return drivers.ErrNoPk
+		return errs.ErrNoPk
 	}
 
 	placeholders := makePairPlaceholders(e.Pk())

@@ -1,6 +1,10 @@
 package dkeepr
 
-import "database/sql"
+import (
+	"database/sql"
+
+	"bitbucket.org/mathsalmi/dkeepr/errors"
+)
 
 // Dkeepr is an ORM object
 type Dkeepr struct {
@@ -38,9 +42,9 @@ func (d *Dkeepr) DriverName() string {
 func (d *Dkeepr) Close() error {
 	switch {
 	case d.driver == nil:
-		return ErrDriverNotChosen
+		return errs.ErrDriverNotChosen
 	case d.driver.DB() == nil:
-		return ErrConnNotOpen
+		return errs.ErrConnNotOpen
 	}
 
 	return d.driver.DB().Close()

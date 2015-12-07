@@ -4,13 +4,14 @@ import (
 	"database/sql"
 
 	"bitbucket.org/mathsalmi/dkeepr/drivers"
+	"bitbucket.org/mathsalmi/dkeepr/errors"
 )
 
 // Begin starts a new transaction
 func (p *Postgres) Begin() (drivers.Transaction, error) {
 	_, err := p.DB().Exec("begin transaction")
 	if err != nil {
-		return nil, drivers.ErrBegin
+		return nil, errs.ErrBegin
 	}
 
 	return &Transaction{db: p.DB()}, nil
@@ -35,12 +36,12 @@ func (tx *Transaction) Add(fn func() error) drivers.Transaction {
 func (tx *Transaction) CommitOrRollback() error {
 	if tx.err != nil {
 		tx.db.Exec("rollback") // TODO: handle err
-		return drivers.ErrCommit
+		return errs.ErrCommit
 	}
 
 	_, err := tx.db.Exec("commit")
 	if err != nil {
-		return drivers.ErrCommit
+		return errs.ErrCommit
 	}
 
 	return nil

@@ -5,6 +5,7 @@ import (
 
 	"bitbucket.org/mathsalmi/dkeepr/drivers"
 	"bitbucket.org/mathsalmi/dkeepr/drivers/postgres"
+	"bitbucket.org/mathsalmi/dkeepr/errors"
 )
 
 // OrmDriver is a DB driver compatible with this ORM
@@ -23,7 +24,7 @@ func newDriver(name string, db *sql.DB) (driver ormDriver, err error) {
 	case "postgres":
 		driver = postgres.New(db)
 	default:
-		err = ErrDriverNotSupported
+		err = errs.ErrDriverNotSupported
 	}
 
 	return

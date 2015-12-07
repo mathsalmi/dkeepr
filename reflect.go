@@ -1,6 +1,10 @@
 package dkeepr
 
-import "reflect"
+import (
+	"reflect"
+
+	"bitbucket.org/mathsalmi/dkeepr/errors"
+)
 
 // returns a value of a reflected object
 func getReflectedValue(t reflect.Kind, val reflect.Value) (value interface{}, err error) {
@@ -20,7 +24,7 @@ func getReflectedValue(t reflect.Kind, val reflect.Value) (value interface{}, er
 		value = val.String()
 	// TODO: how to handle a struct?
 	default:
-		err = ErrUnknownType
+		err = errs.ErrUnknownType
 	}
 
 	return
