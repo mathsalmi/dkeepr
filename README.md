@@ -18,7 +18,7 @@ Currently the following DBMS are supported:
 TODOs
 ---
 
-- Improve error messages (perhaps allow composability of messages)
+- Improve error messages (perhaps allow message composition)
 - Make it work with multiple DBs
 - Create tests
 - Create a pool of connections
