@@ -7,13 +7,12 @@ This is a toy project used to learn the Go language. _It is not intended to be u
 
 Again, the intention here is solely to play with Go.
 
-
 DBMS
 ---
 
 Currently the following DBMS are supported:
-- Postgres
 
+- Postgres
 
 TODOs
 ---
@@ -23,7 +22,6 @@ TODOs
 - Create tests
 - Create a pool of connections
 - Think of a way to customize struct names
-
 
 Bugs & suggestions
 ---
